@@ -3,18 +3,13 @@
 收集日常批量视频创作过程中使用的一些工具集
 
 # 剧本编辑器
+
 其中有不同角色
 
-使用[PocketFlow]{https://github.com/The-Pocket/PocketFlow} 构建AI Agent 框架
-实现三个角色：
+使用[pydantic-ai]{https://github.com/pydantic/pydantic-ai} 实现剧本编辑Agent
 
-绘画风格：提示词
-角色、场景描述
-# 分镜生图
-分镜图片（这个图片需要几张图、图与图之间首尾帧切换）
+![](doc/1.png)
 
-# 图生视频
-视频运镜、角色动作
 
 # 工具箱
 
