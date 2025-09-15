@@ -1,0 +1,17 @@
+{
+  "agent_prompt_mapping": {
+    "story_optimization": "story_optimization.md",
+    "script_design": "script_design.md",
+    "storyboard_design": "storyboard_design.md",
+    "viewer": "viewer.md",
+    "reviewer": "reviewer.md"
+  },
+  "default_prompts_dir": "agent/prompts",
+  "agent_model_mapping": {
+    "story_optimization": "nvidia/nemotron-nano-9b-v2:free",
+    "script_design": "deepseek/deepseek-chat-v3.1:free",
+    "storyboard_design": "deepseek/deepseek-chat-v3.1:free",
+    "viewer": "qwen/qwen3-235b-a22b:free",
+    "reviewer": "qwen/qwen3-235b-a22b:free"
+  }
+}
