@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from httpx import AsyncClient
 from pydantic_ai.models.google import GoogleModel
 from pydantic_ai.providers.google import GoogleProvider
 from google import genai
@@ -19,9 +20,10 @@ load_dotenv()
 def main():
     for model_name in model_names:
         try:
+            http_client = AsyncClient(proxy=os.getenv("PROXY"))
             model = OpenAIChatModel(
                 model_name,
-                provider=OpenRouterProvider(api_key=os.getenv("OPENROUTER_API_KEY")),
+                provider=OpenRouterProvider(api_key=os.getenv("OPENROUTER_API_KEY"),http_client=http_client),
             )
 
             agent = Agent(model)
@@ -29,6 +31,7 @@ def main():
             result = agent.run_sync("你好你是谁？")
             print(result.output)
         except Exception as e:
+            print(e)
             print(f"{model_name}模型调用异常")
 
 

@@ -94,6 +94,7 @@ class AnimationScriptPipeline:
                 """
             else:
                 logger.info("优化性分镜设计需求，直接使用输入")
+                script_text = script_design
 
             result = await self.agent_manager.storyboard_design_agent.run(script_text, deps=self.deps)
             logger.info("分镜设计完成")

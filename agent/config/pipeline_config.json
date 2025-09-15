@@ -8,7 +8,7 @@
   },
   "default_prompts_dir": "agent/prompts",
   "agent_model_mapping": {
-    "story_optimization": "nvidia/nemotron-nano-9b-v2:free",
+    "story_optimization": "deepseek/deepseek-chat-v3.1:free",
     "script_design": "deepseek/deepseek-chat-v3.1:free",
     "storyboard_design": "deepseek/deepseek-chat-v3.1:free",
     "viewer": "qwen/qwen3-235b-a22b:free",
