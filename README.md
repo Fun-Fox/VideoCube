@@ -6,7 +6,8 @@
 
 其中有不同角色
 
-使用[pydantic-ai]{https://github.com/pydantic/pydantic-ai} 实现剧本编辑Agent
+使用(pydantic-ai)[https://github.com/pydantic/pydantic-ai] 
+实现剧本编辑Agent
 
 ![](doc/1.png)
 
