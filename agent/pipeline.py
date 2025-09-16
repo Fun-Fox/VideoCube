@@ -79,7 +79,7 @@ class AnimationScriptPipeline:
         """
         logger.info("开始分镜设计")
         try:
-            if isinstance(script_design,ScriptDesignOutput):
+            if isinstance(script_design, ScriptDesignOutput):
                 logger.info("非优化性分镜设计需求，结构化处理")
                 # 将结构化输入转换为文本输入
                 script_text = f"""
@@ -120,7 +120,7 @@ class AnimationScriptPipeline:
 
         viewer_input = "分镜设计中的画面和动作：\n"
         for i, (element, action) in enumerate(zip(scene_elements, actions)):
-            viewer_input += f"{i + 1}. 画面: {element}\n   动作: {action}\n"
+            viewer_input += f"分镜{i + 1}. 画面一开始的构图描述: {element}\n   画面后续的视觉动态变化: {action}\n"
 
         result = await self.agent_manager.viewer_agent.run(viewer_input, deps=self.deps)
         logger.info("观看者体验完成")
@@ -191,7 +191,8 @@ class AnimationScriptPipeline:
             if review_suggestion:
                 # 如果需要继续优化，则重新进行分镜设计
                 logger.info("根据审核员建议重新优化分镜...")
-                storyboard = await self.design_storyboard(f"原分镜设计：\n {storyboard}\n\n 优化建议：\n {review_suggestion}")
+                storyboard = await self.design_storyboard(
+                    f"原分镜设计：\n {storyboard}\n\n 优化建议：\n {review_suggestion}")
                 logger.info("分镜设计优化完成")
             else:
                 # 步骤3: 分镜设计
