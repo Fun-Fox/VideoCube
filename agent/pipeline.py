@@ -86,12 +86,10 @@ class AnimationScriptPipeline:
     角色设计:
     {chr(10).join([f"- {char.name}: {char.characteristics}, 外观: {char.appearance}" for char in script_design.characters])}
     
-    场景设计:
-    {chr(10).join([f"- {scene.scene_id}: {scene.description}" for scene in script_design.scenes])}
-    
     情节点:
-    {chr(10).join([f"- {plot.point_id} {plot.title}: {plot.description}" for plot in script_design.plot_points])}
+    {chr(10).join([f"-  {plot.title}: {plot.description}" for plot in script_design.plot_points])}
                 """
+            #     chr(10) 是换行符的ASCII字符表示，等同于 \n
             else:
                 logger.info("优化性分镜设计需求，直接使用输入")
                 script_text = script_design
