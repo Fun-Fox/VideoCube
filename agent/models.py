@@ -10,7 +10,7 @@ class StoryboardInfo(BaseModel):
     """分镜脚本信息"""
     shot_id: str = Field(description="镜号")
     plot_title: str = Field(description="情节标题")
-    scene_elements: str = Field(description="画面一开始的构图描述")
+    scene_elements: str = Field(description="开始画面")
     actions: str = Field(description="画面后续的动作")
     bgm_description: str = Field(description="BGM描述")
     sound_effect: str = Field(description="特效音描述")
