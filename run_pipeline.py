@@ -84,8 +84,8 @@ def save_to_excel(animation_output, script_design):
         storyboard_data.append({
             "镜号": storyboard.shot_id,
             "情节标题": storyboard.plot_title,
-            "开始画面": storyboard.scene_elements,
-            "后续动作": storyboard.actions,
+            "分镜画面文字描述": storyboard.scene_elements,
+            "动作设计": storyboard.actions,
             "BGM描述": storyboard.bgm_description,
             "特效音描述": storyboard.sound_effect,
             "建议时长": storyboard.duration
