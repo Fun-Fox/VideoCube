@@ -173,7 +173,7 @@ class AnimationScriptPipeline:
 
         # 步骤1: 优化故事
         optimized_story = await self.optimize_story(original_story)
-        logger.info(f"优化后的故事: {optimized_story[:100]}...")
+        logger.info(f"优化后的故事: {optimized_story}...")
 
         iteration = 0
         storyboard = None
@@ -199,12 +199,12 @@ class AnimationScriptPipeline:
 
             # 步骤4: 观看者体验
             viewer_story = await self.viewer_experience(storyboard)
-            logger.info(f"观看者体验描述: {viewer_story[:100]}...")
+            logger.info(f"观看者体验描述: {viewer_story}...")
 
             # 步骤5: 审核员评审
             review_suggestion, need_continue = await self.review_and_suggest(optimized_story, viewer_story,
                                                                              storyboard)
-            logger.info(f"审核员建议: {review_suggestion[:100]}...")
+            logger.info(f"审核员建议: {review_suggestion}...")
 
             if not need_continue:
                 logger.info("审核员认为故事已经符合要求，结束优化循环")
