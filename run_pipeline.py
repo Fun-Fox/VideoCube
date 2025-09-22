@@ -20,7 +20,7 @@ async def main():
     
     # 示例剧本片段
     sample_script = """
-        孤岛生存为背景的无声的短视频 ,
+        孤岛生存为背景的短视频 ,
     故事的最后一幕，故事反转，且引人深思
     """
     
@@ -84,8 +84,9 @@ def save_to_excel(animation_output, script_design):
         storyboard_data.append({
             "镜号": storyboard.shot_id,
             "情节标题": storyboard.plot_title,
-            "分镜画面文字描述": storyboard.scene_elements,
+            "画面描述": storyboard.scene_elements,
             "动作设计": storyboard.actions,
+            "旁白": storyboard.narrator,
             "BGM描述": storyboard.bgm_description,
             "特效音描述": storyboard.sound_effect,
             "建议时长": storyboard.duration

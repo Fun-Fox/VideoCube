@@ -12,6 +12,7 @@ class StoryboardInfo(BaseModel):
     plot_title: str = Field(description="情节标题")
     scene_elements: str = Field(description="分镜画面文字描述")
     actions: str = Field(description="动作设计")
+    narrator: str = Field(description="旁白")
     bgm_description: str = Field(description="BGM描述")
     sound_effect: str = Field(description="特效音")
     duration: str = Field(description="建议时长")
