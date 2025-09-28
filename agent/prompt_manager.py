@@ -4,7 +4,7 @@
 """
 
 import os
-from loguru import logger
+from agent.log_config import logger
 
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

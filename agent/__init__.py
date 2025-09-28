@@ -4,11 +4,7 @@
 每个Agent对应一个提示词文件，通过Pipeline协调整个解析流程。
 """
 
-from agent.pipeline import AnimationScriptPipeline
-from agent.models import StoryboardInfo, AnimationScriptOutput
+from .pipeline import AnimationScriptPipeline
+from .template_manager import TemplateManager
 
-__all__ = [
-    "AnimationScriptPipeline",
-    "StoryboardInfo", 
-    "AnimationScriptOutput"
-]
+__all__ = ['AnimationScriptPipeline', 'TemplateManager']

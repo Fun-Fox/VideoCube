@@ -9,10 +9,10 @@
   "default_prompts_dir": "agent/prompts",
   "default_templates_dir": "templates",
   "agent_model_mapping": {
-    "story_optimization": "deepseek/deepseek-chat-v3.1:free",
-    "script_design": "deepseek/deepseek-chat-v3.1:free",
-    "storyboard_design": "deepseek/deepseek-chat-v3.1:free",
-    "viewer": "qwen/qwen3-235b-a22b:free",
-    "reviewer": "qwen/qwen3-235b-a22b:free"
+    "story_optimization": "gemini-2.5-pro",
+    "script_design": "gemini-2.5-pro",
+    "storyboard_design": "gemini-2.5-pro",
+    "viewer": "gemini-2.5-pro",
+    "reviewer": "gemini-2.5-pro"
   }
 }

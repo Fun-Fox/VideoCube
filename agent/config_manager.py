@@ -6,14 +6,14 @@
 import json
 import os
 from typing import Dict, Any
-from loguru import logger
-
+from agent.log_config import logger
 
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
 class ConfigManager:
     """配置管理器"""
-    
+
     def __init__(self, config_path: str = "agent/config/pipeline_config.json"):
         """
         初始化配置管理器
@@ -22,7 +22,7 @@ class ConfigManager:
             config_path: 配置文件路径
         """
         self.config = self._load_config(os.path.join(root_dir, config_path))
-    
+
     def _load_config(self, config_path: str) -> Dict[str, Any]:
         """
         加载配置文件
@@ -45,7 +45,7 @@ class ConfigManager:
         except Exception as e:
             logger.error(f"加载配置文件时出错: {e}")
             raise
-    
+
     def get(self, key: str, default: Any = None) -> Any:
         """
         获取配置项的值
@@ -58,7 +58,7 @@ class ConfigManager:
             配置项的值或默认值
         """
         return self.config.get(key, default)
-    
+
     def get_agent_prompt_file(self, agent_name: str) -> str:
         """
         获取指定Agent的提示词文件名
@@ -71,7 +71,7 @@ class ConfigManager:
         """
         agent_prompt_mapping = self.config.get("agent_prompt_mapping", {})
         return agent_prompt_mapping.get(agent_name)
-    
+
     def get_agent_model_name(self, agent_name: str, default_model: str = "gemini-2.5-flash") -> str:
         """
         获取指定Agent的模型名称

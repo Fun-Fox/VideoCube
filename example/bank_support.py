@@ -4,15 +4,27 @@
 
     uv run -m pydantic_ai_examples.bank_support
 """
-
+import os
 from dataclasses import dataclass
 
+import logfire
+from openai import NOT_GIVEN, APIStatusError, AsyncStream
+from openai.types import chat
+from openai.types.chat import ChatCompletionChunk
 from pydantic import BaseModel
 
-from pydantic_ai import Agent, RunContext
-from pydantic_ai.models.openai import OpenAIChatModel
-from pydantic_ai.providers.openrouter import OpenRouterProvider
+from pydantic_ai import Agent, RunContext, ModelSettings, ModelHTTPError
+from pydantic_ai.messages import ModelMessage, ModelResponse
 
+from pydantic_ai.models.openai import OpenAIChatModel, OpenAIChatModelSettings
+from pydantic_ai.profiles.openai import OpenAIModelProfile
+from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.providers.openrouter import OpenRouterProvider
+from dotenv import load_dotenv
+
+load_dotenv()
+logfire.configure(token="pylf_v1_us_xNS6fZMrFGwWSHPgm3CK7h0MKPJQGSVPRzDbSyKRDwzD")
+logfire.instrument_pydantic_ai()
 
 class DatabaseConn:
     """这是一个用于示例目的的假数据库。
@@ -53,9 +65,42 @@ class SupportOutput(BaseModel):
 
 
 OPENROUTER_API_KEY = "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"
-provider = OpenRouterProvider(api_key=OPENROUTER_API_KEY)
+# provider = OpenRouterProvider(api_key=OPENROUTER_API_KEY)
+import httpx
+class LoggingAsyncClient(httpx.AsyncClient):
+    async def send(self, request: httpx.Request, *args, **kwargs) -> httpx.Response:
+        # 打印请求详情
+        print("=== HTTP Request ===")
+        print(f"Method: {request.method}")
+        print(f"URL: {request.url}")
+        print(f"Headers: {dict(request.headers)}")
+        if request.content:
+            print(f"Body: {request.content.decode('utf-8', errors='ignore')}")
+        print("==================")
 
-model = OpenAIChatModel(model_name='deepseek/deepseek-chat-v3.1:free',provider=provider)
+        # 发送请求
+        response = await super().send(request, *args, **kwargs)
+
+        # 打印响应详情
+        print("=== HTTP Response ===")
+        print(f"Status Code: {response.status_code}")
+        print(f"Headers: {dict(response.headers)}")
+        print(f"Response: {response.text[:1000]}...")  # 只打印前1000个字符
+        print("===================")
+
+        return response
+
+
+# 然后在创建 provider 时使用这个自定义客户端
+provider = OpenAIProvider(
+    base_url=os.getenv("OPENAI_BASE_URL"),
+    api_key=os.getenv("OPENAI_API_KEY"),
+    http_client=LoggingAsyncClient()
+)# https://ai.pydantic.dev/output/#streaming-structured-output
+
+
+model = OpenAIChatModel(model_name='deepgeminipro', provider=provider)
+
 support_agent = Agent(
     model,
     deps_type=SupportDependencies,
@@ -75,7 +120,7 @@ async def add_customer_name(ctx: RunContext[SupportDependencies]) -> str:
 
 @support_agent.tool
 async def customer_balance(
-    ctx: RunContext[SupportDependencies], include_pending: bool
+        ctx: RunContext[SupportDependencies], include_pending: bool
 ) -> str:
     """返回客户的当前账户余额。"""
     balance = await ctx.deps.db.customer_balance(
@@ -87,7 +132,8 @@ async def customer_balance(
 
 if __name__ == '__main__':
     deps = SupportDependencies(customer_id=123, db=DatabaseConn())
-    result = support_agent.run_sync('我的余额是多少？', deps=deps)
+
+    result = support_agent.run_stream('我的余额是多少？', deps=deps)
     print(result.output)
     """
     support_advice='你好 John，您包含待处理交易的当前账户余额为 $123.45。' block_card=False risk=1

@@ -4,12 +4,13 @@
 """
 
 from typing import Optional
-from loguru import logger
+from agent.log_config import logger
 from pydantic_ai import Agent
 
 from agent.models import AnimationScriptOutput, ScriptDesignOutput
 from agent.config_manager import ConfigManager
 from agent.prompt_manager import PromptManager
+from agent.template_manager import TemplateManager
 from agent.model_manager import ModelManager
 
 
@@ -17,7 +18,7 @@ from agent.model_manager import ModelManager
 class AgentManager:
     """Agent管理器"""
     
-    def __init__(self, config_manager: ConfigManager, prompt_manager: PromptManager, model_manager: ModelManager):
+    def __init__(self, config_manager: ConfigManager, prompt_manager: PromptManager, model_manager: ModelManager, template_manager: TemplateManager):
         """
         初始化Agent管理器
         
@@ -25,10 +26,12 @@ class AgentManager:
             config_manager: 配置管理器
             prompt_manager: 提示词管理器
             model_manager: 模型管理器
+            template_manager: 模板管理器
         """
         self.config_manager = config_manager
         self.prompt_manager = prompt_manager
         self.model_manager = model_manager
+        self.template_manager = template_manager
         
         # 初始化Agents
         self.story_optimization_agent: Optional[Agent] = None

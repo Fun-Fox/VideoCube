@@ -5,13 +5,14 @@
 """
 
 import asyncio
-from loguru import logger
+from agent.log_config import logger
 
-from typing import Tuple
+from typing import Tuple, Optional
 
 from agent.models import AnimationScriptOutput, ScriptDesignOutput
 from agent.config_manager import ConfigManager
 from agent.prompt_manager import PromptManager
+from agent.template_manager import TemplateManager
 from agent.model_manager import ModelManager
 from agent.agent_manager import AgentManager
 
@@ -29,25 +30,40 @@ class AnimationScriptPipeline:
         # 初始化管理器
         self.config_manager = ConfigManager(config_path)
         self.prompt_manager = PromptManager(self.config_manager.get("default_prompts_dir", "agent/prompts"))
+        self.template_manager = TemplateManager(self.config_manager.get("default_templates_dir", "templates"))
         self.model_manager = ModelManager()
-        self.agent_manager = AgentManager(self.config_manager, self.prompt_manager, self.model_manager)
+        self.agent_manager = AgentManager(self.config_manager, self.prompt_manager, self.model_manager,self.template_manager)
 
         # 创建deps对象用于Agent运行
         self.deps = None  # 根据实际需要初始化
 
         logger.info("动画脚本解析Pipeline初始化完成")
 
-    async def optimize_story(self, original_story: str) -> str:
+    async def optimize_story(self, original_story: str, story_template: Optional[str] = None) -> str:
         """
         优化故事使其更清晰完整
         
         Args:
             original_story: 原始故事文本
+            story_template: 故事模板文件名（可选）
             
         Returns:
             str: 优化后的故事文本
         """
         logger.info("开始优化故事")
+        
+        # 如果提供了模板，则读取模板内容并在输入中使用
+        if story_template:
+            template_content = self.template_manager.read_story_template(story_template)
+            if template_content:
+                logger.info(f"使用故事模板: {story_template}")
+                # 将模板作为参考内容添加到输入中
+                enhanced_input = f"# 参考故事模板: \n{template_content}\n\n# 请参考以上模板的结构和风格，优化以下故事: \n{original_story}"
+                result = await self.agent_manager.story_optimization_agent.run(enhanced_input, deps=self.deps)
+                logger.info("故事优化完成")
+                return result.output
+        
+        # 使用原有逻辑
         result = await self.agent_manager.story_optimization_agent.run(original_story, deps=self.deps)
         logger.info("故事优化完成")
         return result.output
@@ -67,12 +83,13 @@ class AnimationScriptPipeline:
         logger.info("剧本设计完成")
         return result.output
 
-    async def design_storyboard(self, script_design) -> AnimationScriptOutput:
+    async def design_storyboard(self, script_design, storyboard_template: Optional[str] = None) -> AnimationScriptOutput:
         """
         根据剧本设计分镜
         
         Args:
             script_design: 剧本设计输出
+            storyboard_template: 分镜模板文件名（可选）
             
         Returns:
             AnimationScriptOutput: 结构化的动画脚本数据
@@ -93,6 +110,17 @@ class AnimationScriptPipeline:
             else:
                 logger.info("优化性分镜设计需求，直接使用输入")
                 script_text = script_design
+
+            # 如果提供了分镜模板，则读取模板内容并在输入中使用
+            if storyboard_template:
+                template_content = self.template_manager.read_storyboard_template(storyboard_template)
+                if template_content:
+                    logger.info(f"使用分镜模板: {storyboard_template}")
+                    # 将模板作为参考内容添加到输入中
+                    enhanced_input = f"参考分镜模板:\n{template_content}\n\n请参考以上模板的结构和风格，为以下剧本设计分镜:\n{script_text}"
+                    result = await self.agent_manager.storyboard_design_agent.run(enhanced_input, deps=self.deps)
+                    logger.info("分镜设计完成")
+                    return result.output
 
             result = await self.agent_manager.storyboard_design_agent.run(script_text, deps=self.deps)
             logger.info("分镜设计完成")
@@ -157,13 +185,18 @@ class AnimationScriptPipeline:
         logger.info(f"审核员评审完成，需要继续优化: {need_continue}")
         return review_output, need_continue
 
-    async def process_animation_story(self, original_story: str, max_iterations: int = 3) -> tuple[
+    async def process_animation_story(self, original_story: str, 
+                                      story_template: Optional[str] = None,
+                                      storyboard_template: Optional[str] = None,
+                                      max_iterations: int = 2) -> tuple[
         AnimationScriptOutput, ScriptDesignOutput]:
         """
         完整处理动画故事的优化流程
         
         Args:
             original_story: 原始故事
+            story_template: 故事模板文件名（可选）
+            storyboard_template: 分镜模板文件名（可选）
             max_iterations: 最大迭代次数
             
         Returns:
@@ -172,7 +205,7 @@ class AnimationScriptPipeline:
         logger.info("开始完整处理动画故事...")
 
         # 步骤1: 优化故事
-        optimized_story = await self.optimize_story(original_story)
+        optimized_story = await self.optimize_story(original_story, story_template)
         logger.info(f"优化后的故事: {optimized_story}...")
 
         iteration = 0
@@ -190,11 +223,12 @@ class AnimationScriptPipeline:
                 # 如果需要继续优化，则重新进行分镜设计
                 logger.info("根据审核员建议重新优化分镜...")
                 storyboard = await self.design_storyboard(
-                    f"原分镜设计：\n {storyboard}\n\n 优化建议：\n {review_suggestion}")
+                    f"原分镜设计：\n {storyboard}\n\n 优化建议：\n {review_suggestion}", 
+                    storyboard_template)
                 logger.info("分镜设计优化完成")
             else:
                 # 步骤3: 分镜设计
-                storyboard = await self.design_storyboard(script_design)
+                storyboard = await self.design_storyboard(script_design, storyboard_template)
                 logger.info("分镜设计完成")
 
             # 步骤4: 观看者体验

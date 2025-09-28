@@ -5,7 +5,7 @@
 
 import asyncio
 import re
-from loguru import logger
+from agent.log_config import logger
 from datetime import datetime
 import pandas as pd
 
@@ -20,9 +20,19 @@ async def main():
     
     # 示例剧本片段
     sample_script = """
-        孤岛生存为背景的短视频 ,
-    故事的最后一幕，故事反转，且引人深思
+       始祖鸟在极高海拔地区赞助该活动的原因，在烟花秀中始祖鸟的角色，是否在事前进行了生态学评估，是否科学论证过在高海拔、低温环境下烟花材料的降解性不会对生态造成破坏等。
     """
+    
+    # 获取可用模板
+    story_templates = pipeline.template_manager.list_story_templates()
+    storyboard_templates = pipeline.template_manager.list_storyboard_templates()
+    
+    logger.info(f"可用故事模板: {story_templates}")
+    logger.info(f"可用分镜模板: {storyboard_templates}")
+    
+    # 选择使用的模板（这里可以设置为具体的模板文件名，或者None表示不使用模板）
+    story_template = None  # 示例: "example_story_template.md"
+    storyboard_template = None  # 示例: "example_storyboard_template.md"
     
     try:
         logger.info("原始故事:")
@@ -30,7 +40,11 @@ async def main():
         
         # 完整处理流程
         logger.info("开始完整处理流程...")
-        final_result, script_design = await pipeline.process_animation_story(sample_script)
+        final_result, script_design = await pipeline.process_animation_story(
+            sample_script, 
+            story_template=story_template,
+            storyboard_template=storyboard_template
+        )
         
         # 保存结果到Excel文件
         save_to_excel(final_result, script_design)
